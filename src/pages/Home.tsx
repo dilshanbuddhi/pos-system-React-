@@ -1,12 +1,13 @@
 import { Component } from 'react';
-import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 
 class Home extends Component {
     render() {
         return (
             <div className="min-h-screen flex flex-col">
+{/*
                 <NavBar />
+*/}
 
                 {/* Main Content */}
                 <main className="flex-1 pt-20 px-4 sm:px-8 text-center">

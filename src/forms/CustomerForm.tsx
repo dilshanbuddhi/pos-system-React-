@@ -1,107 +1,153 @@
-import { FaUsers } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import type { CustomerType } from "../Types/CustomerType.tsx";
+import { type ChangeEvent, useState } from "react";
+import type { Customer } from "../Types/Customer";
 
-interface CustomerFormProps {
-    editCustomer: CustomerType | null;
-    onCancel: () => void;
-    onSave: (customer: { name: string; email: string; phone: string }) => void;
+export interface CustomerFormData {
+    name: string;
+    address: string;
+    dateOfBirth: string;
 }
 
-const CustomerForm = ({ onSave, onCancel, editCustomer }: CustomerFormProps) => {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
+const initialForm: CustomerFormData = {
+    name: "",
+    address: "",
+    dateOfBirth: "",
+};
 
-    useEffect(() => {
-        if (editCustomer) {
-            setName(editCustomer.name);
-            setEmail(editCustomer.email);
-            setPhone(editCustomer.phone);
-        } else {
-            setName("");
-            setEmail("");
-            setPhone("");
+interface CustomerFormProps {
+    onSubmit: (customer: Customer) => void;
+    onCancel: () => void;
+    initialValues?: Customer;
+}
+
+const CustomerForm = ({ onSubmit, onCancel, initialValues }: CustomerFormProps) => {
+    const initialFormData: CustomerFormData = initialValues
+        ? {
+            name: initialValues.name,
+            dateOfBirth: initialValues.dateOfBirth,
+            address: initialValues.address,
         }
-    }, [editCustomer]);
+        : initialForm;
 
-    const saveOnAction = (event: React.FormEvent) => {
-        event.preventDefault();
-        if (!name || !email || !phone) return;
+    const [form, setForm] = useState<CustomerFormData>(initialFormData);
+    const [errors, setErrors] = useState<Partial<Record<keyof CustomerFormData, string>>>({});
 
-        onSave({ name, email, phone });
+    // Basic validation
+    const validate = (): Partial<Record<keyof CustomerFormData, string>> => {
+        const newErrors: Partial<Record<keyof CustomerFormData, string>> = {};
+        if (!form.name.trim()) newErrors.name = "Name is required";
+        if (!form.address.trim()) newErrors.address = "Address is required";
+        if (!form.dateOfBirth.trim()) {
+            newErrors.dateOfBirth = "Date of birth is required";
+        } else if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dateOfBirth)) {
+            newErrors.dateOfBirth = "Use format YYYY-MM-DD";
+        }
+        return newErrors;
+    };
 
-        // Clear form
-        setName("");
-        setEmail("");
-        setPhone("");
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = () => {
+        const validationErrors = validate();
+        setErrors(validationErrors);
+
+        if (Object.keys(validationErrors).length === 0) {
+            onSubmit({
+                name: form.name,
+                dateOfBirth: form.dateOfBirth,
+                address: form.address,
+                id: initialValues ? initialValues.id : Date.now(),
+            });
+            setForm(initialForm);
+            setErrors({});
+        }
     };
 
     return (
-        <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center mb-6">
-                <FaUsers className="text-blue-600 mr-2" />
-                {editCustomer ? "Edit Customer" : "Add New Customer"}
-            </h2>
+        <div className="w-full max-w-lg">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            name="name"
+                            type="text"
+                            value={form.name}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                errors.name
+                                    ? "border-red-300 focus:ring-red-500"
+                                    : "border-gray-300"
+                            }`}
+                            placeholder="Enter customer name"
+                        />
+                        {errors.name && (
+                            <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                        )}
+                    </div>
 
-            <form className="space-y-5" onSubmit={saveOnAction}>
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter full name"
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            name="address"
+                            type="text"
+                            value={form.address}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                errors.address
+                                    ? "border-red-300 focus:ring-red-500"
+                                    : "border-gray-300"
+                            }`}
+                            placeholder="Enter address"
+                        />
+                        {errors.address && (
+                            <p className="mt-1 text-sm text-red-500">{errors.address}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Date of Birth <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            name="dateOfBirth"
+                            type="date"
+                            value={form.dateOfBirth}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                errors.dateOfBirth
+                                    ? "border-red-300 focus:ring-red-500"
+                                    : "border-gray-300"
+                            }`}
+                        />
+                        {errors.dateOfBirth && (
+                            <p className="mt-1 text-sm text-red-500">{errors.dateOfBirth}</p>
+                        )}
+                    </div>
                 </div>
 
-                <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter email address"
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
+                <div className="mt-6 flex items-center justify-end space-x-3">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {initialValues ? "Save Changes" : "Add Customer"}
+                    </button>
                 </div>
-
-                <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                        Phone
-                    </label>
-                    <input
-                        type="tel"
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Enter phone number"
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-                >
-                    {editCustomer ? "Update" : "Submit"}
-                </button>
-
-                <button
-                    onClick={onCancel}
-                    type="button"
-                    className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
-                >
-                    Cancel
-                </button>
-            </form>
+            </div>
         </div>
     );
 };

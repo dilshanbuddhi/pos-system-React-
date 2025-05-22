@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { FaUsers, FaBoxes, FaShoppingCart } from "react-icons/fa";
-import NavBar from "../components/NavBar.tsx";
 
 const DashboardPage = () => {
     const navigate = useNavigate();
@@ -16,7 +15,7 @@ const DashboardPage = () => {
             label: "Stocks",
             icon: <FaBoxes className="w-8 h-8 mb-2" />,
             color: "from-green-500 to-green-700",
-            to: "/stocks",
+            to: "/dashboard/stock",
         },
         {
             label: "Orders",
@@ -28,7 +27,6 @@ const DashboardPage = () => {
 
     return (
         <div>
-            <NavBar/>
             <div
                 className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center px-4">
                 <h1 className="text-4xl font-extrabold text-blue-700 mb-10 drop-shadow-lg">
