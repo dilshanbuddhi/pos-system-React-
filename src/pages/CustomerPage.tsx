@@ -1,28 +1,48 @@
-import { useState } from "react";
+import {useReducer, useState} from "react";
 import { customerData } from "../data/CustomerData";
 import type { Customer } from "../Types/Customer";
 import CustomerForm from "../forms/CustomerForm";
 import Dialog from "../components/Dialog";
 import { PencilIcon, TrashIcon, PlusIcon, UserIcon } from "lucide-react";
+import CustomerReducer from "../reducer/CustomerReducer.ts";
 
 const CustomerPage = () => {
+/*
     const [customers, setCustomers] = useState<Customer[]>(customerData);
+*/
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+    const [customerState, dispatch] = useReducer(CustomerReducer, customerData);
 
     const onSubmit = (customer: Customer) => {
         if (editingCustomer !== null) {
             // updating
-            setCustomers((prevState) =>
+          /*  setCustomers((prevState) =>
                 prevState.map((originalCustomer) =>
                     originalCustomer.id === customer.id
                         ? { ...originalCustomer, ...customer }
                         : originalCustomer
                 )
-            );
+            );*/
+
+            dispatch(
+                {
+                    type: "UPDATE",
+                    payload: customer
+                }
+            )
+
         } else {
             // add
+/*
             setCustomers([...customers, customer]);
+*/
+            dispatch(
+                {
+                    type: "ADD",
+                    payload: customer
+                }
+            )
         }
 
         setIsDialogOpen(false);
@@ -38,9 +58,16 @@ const CustomerPage = () => {
     };
 
     const onDelete = (id: number) => {
-        setCustomers((prevState) =>
+        /*setCustomers((prevState) =>
             prevState.filter((customer) => customer.id !== id)
-        );
+        );*/
+
+        dispatch(
+            {
+                type: "DELETE",
+                payload: id
+            }
+        )
     };
 
     const onEdit = (customer: Customer) => {
@@ -64,7 +91,7 @@ const CustomerPage = () => {
                 </button>
             </div>
 
-            {customers.length === 0 ? (
+            {customerState.length === 0 ? (
                 <div className="bg-gray-50 p-8 text-center rounded-lg border border-gray-200">
                     <p className="text-gray-500">No customers found. Add your first customer!</p>
                 </div>
@@ -88,7 +115,7 @@ const CustomerPage = () => {
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {customers.map((customer, index) => (
+                        {customerState.map((customer, index) => (
                             <tr
                                 key={index}
                                 className="hover:bg-gray-50 transition-colors duration-150"
