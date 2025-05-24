@@ -4,6 +4,7 @@ import {useState} from "react";
 interface StockFormProps {
     onsubmit: (stock : StockType) => void
     oncancel: () => void
+    initialValues?: StockType
 }
 
 export interface StockFormData {
@@ -13,7 +14,7 @@ export interface StockFormData {
     m_unit: string;
 }
 
-const initialValues : StockFormData = {
+const initialForm : StockFormData = {
     name: "",
     price: 0,
     qty: 0,
@@ -21,15 +22,21 @@ const initialValues : StockFormData = {
 }
 
 
-export const StockForm = ({oncancel , onsubmit} : StockFormProps) => {
-/*
-    const initialFormData: CustomerFormData = initialValues;
-*/
+export const StockForm = ({oncancel , onsubmit , initialValues} : StockFormProps) => {
+    const initialFormData: StockFormData = initialValues
+        ? {
+            name: initialValues.name,
+            price: initialValues.price,
+            qty: initialValues.qty,
+            m_unit: initialValues.m_unit
+        }
+        : initialForm;
 
-    const [form , setForm] = useState<StockFormData>(initialValues);
+    const [form , setForm] = useState<StockFormData>(initialFormData);
 
     const onSubmit = () => {
         console.log(form);
+
         onsubmit(
             {
                 id: Date.now(),
@@ -39,7 +46,7 @@ export const StockForm = ({oncancel , onsubmit} : StockFormProps) => {
                 m_unit: form.m_unit,
             }
         );
-        setForm(initialValues);
+        setForm(initialForm);
     }
 
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

@@ -8,9 +8,22 @@ import type {StockType} from "../Types/StockType.ts";
 const StockPage = () =>{
      const [isDialogOpen , setIsDialogOpen] = useState <boolean>( false );
      const [stocks , setStocks] = useState<StockType[]>(stockData);
+     const [stockToEdit, setStockToEdit] = useState<StockType | null>(null);
+
+     const onEdit = (stock: StockType) => () => {
+         setStockToEdit(stock);
+         setIsDialogOpen(true);
+     }
 
      const onSubmit = (stock: StockType) => {
-         setStocks([...stocks, stock]);
+         if (stockToEdit !== null) {
+             setStocks(prevState =>
+                 prevState.map((originalStock) =>
+                     originalStock.id === stock.id ? stock : originalStock)
+             );
+         }else {
+             setStocks([...stocks, stock]);
+         }
          setIsDialogOpen(false);
      }
 
@@ -92,6 +105,7 @@ const StockPage = () =>{
                                     <button
                                         className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50 transition-colors duration-150"
                                         title="Edit customer"
+                                        onClick={onEdit(stock)}
                                     >
                                         <PencilIcon size={18} />
                                     </button>
@@ -113,11 +127,12 @@ const StockPage = () =>{
             <Dialog
                 isDialogOpen={isDialogOpen}
                 title={"Add Stock"}
-
             >
                 <StockForm
                     onsubmit = {onSubmit}
                     oncancel={oncancel}
+                    initialValues={stockToEdit !== null ? stockToEdit : undefined}
+
                 />
             </Dialog>
         </div>
