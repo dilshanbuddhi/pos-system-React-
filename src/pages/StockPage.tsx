@@ -12,7 +12,7 @@ const StockPage = () =>{
      const [stocks , setStocks] = useState<StockType[]>(stockData);
 */
      const [stockToEdit, setStockToEdit] = useState<StockType | null>(null);
-     const [srockState, dispatch] = useReducer(StockReducer, stockData);
+     const [stockState, dispatch] = useReducer(StockReducer, stockData);
 
      const onEdit = (stock: StockType) => () => {
          setStockToEdit(stock);
@@ -67,7 +67,7 @@ const StockPage = () =>{
                 </button>
             </div>
 
-            {srockState.length === 0 ? (
+            {stockState.length === 0 ? (
                 <div className="bg-gray-50 p-8 text-center rounded-lg border border-gray-200">
                     <p className="text-gray-500">No Stocks found. Add your first Stock!</p>
                 </div>
@@ -94,7 +94,7 @@ const StockPage = () =>{
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {srockState.map((stock, index) => (
+                        {stockState.map((stock, index) => (
                             <tr
                                 key={index}
                                 className="hover:bg-gray-50 transition-colors duration-150"

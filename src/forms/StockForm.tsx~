@@ -55,8 +55,11 @@ export const StockForm = ({ oncancel, onsubmit, initialValues }: StockFormProps)
     };
 
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-
+        const value = e.target.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value;
+        setForm({
+            ...form,
+            [e.target.name]: value
+        });
     };
 
     const InputField = ({
