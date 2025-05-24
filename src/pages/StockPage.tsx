@@ -2,13 +2,17 @@ import {PencilIcon, PlusIcon, TrashIcon, UserIcon} from "lucide-react";
 import { stockData } from "../data/StockData";
 import Dialog from "../components/Dialog";
 import {StockForm} from "../forms/StockForm.tsx";
-import {useState} from "react";
+import {useReducer, useState} from "react";
 import type {StockType} from "../Types/StockType.ts";
+import StockReducer from "../reducer/StockReducer.ts";
 
 const StockPage = () =>{
      const [isDialogOpen , setIsDialogOpen] = useState <boolean>( false );
+/*
      const [stocks , setStocks] = useState<StockType[]>(stockData);
+*/
      const [stockToEdit, setStockToEdit] = useState<StockType | null>(null);
+     const [srockState, dispatch] = useReducer(StockReducer, stockData);
 
      const onEdit = (stock: StockType) => () => {
          setStockToEdit(stock);
@@ -17,12 +21,16 @@ const StockPage = () =>{
 
      const onSubmit = (stock: StockType) => {
          if (stockToEdit !== null) {
-             setStocks(prevState =>
+            /* setStocks(prevState =>
                  prevState.map((originalStock) =>
                      originalStock.id === stock.id ? stock : originalStock)
-             );
+             );*/
+             dispatch({type: "UPDATE", payload: stock});
          }else {
+/*
              setStocks([...stocks, stock]);
+*/
+             dispatch({type: "ADD", payload: stock});
          }
          setIsDialogOpen(false);
      }
@@ -32,11 +40,15 @@ const StockPage = () =>{
      }
 
      const saveBtnClicked = () => {
+         setStockToEdit(null);
          setIsDialogOpen(true);
      }
 
      const onDelete = (id: number) => () => {
+/*
          setStocks(stocks.filter((stock) => stock.id !== id));
+*/
+         dispatch({type: "DELETE", payload: id});
      }
 
     return (
@@ -55,7 +67,7 @@ const StockPage = () =>{
                 </button>
             </div>
 
-            {stocks.length === 0 ? (
+            {srockState.length === 0 ? (
                 <div className="bg-gray-50 p-8 text-center rounded-lg border border-gray-200">
                     <p className="text-gray-500">No Stocks found. Add your first Stock!</p>
                 </div>
@@ -82,7 +94,7 @@ const StockPage = () =>{
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {stocks.map((stock, index) => (
+                        {srockState.map((stock, index) => (
                             <tr
                                 key={index}
                                 className="hover:bg-gray-50 transition-colors duration-150"

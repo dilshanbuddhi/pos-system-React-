@@ -39,7 +39,7 @@ export const StockForm = ({oncancel , onsubmit , initialValues} : StockFormProps
 
         onsubmit(
             {
-                id: Date.now(),
+                id: initialValues ? initialValues.id : Date.now(),
                 name: form.name,
                 price: form.price,
                 qty: form.qty,

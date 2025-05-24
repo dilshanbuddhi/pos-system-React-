@@ -7,7 +7,7 @@ type StockReducer =
 }
 | {
     type: "DELETE";
-    payload: StockType;
+    payload: number;
 }
 | {
     type: "UPDATE";
@@ -16,16 +16,17 @@ type StockReducer =
 
 
 
-const customerReducer = (state: StockType[], action: StockReducer) => {
+const stockReducer = (state: StockType[], action: StockReducer) => {
     switch (action.type) {
         case "ADD":
             return [...state, action.payload];
         case "DELETE":
-            return state.filter((stock) => stock.id !== action.payload.id);
+            return state.filter((stock) => stock.id !== action.payload);
             case "UPDATE":
             return state.map((stock) => stock.id === action.payload.id ? action.payload : stock);
         default:
+            return state
     }
 }
 
-export default customerReducer
+export default stockReducer
